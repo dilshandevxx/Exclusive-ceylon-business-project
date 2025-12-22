@@ -5,7 +5,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer-content">
           <div className="footer-column">
-            <h3 className="footer-logo">TravelFinds</h3>
+            <h3 className="footer-logo">Exclusive Ceylon</h3>
             <p className="footer-text">
               Curating the best travel gear for your adventures. 
               Explore the world with comfort and style.
@@ -24,7 +24,7 @@ export default function Footer() {
 
           <div className="footer-column">
             <h4 className="footer-heading">Contact</h4>
-            <p className="footer-text">Email: hello@travelfinds.com</p>
+            <p className="footer-text">Email: hello@exclusiveceylon.com</p>
             <p className="footer-text">Phone: +1 234 567 890</p>
             <p className="footer-text">123 Adventure Lane, Wanderlust City</p>
           </div>
@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
         
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} TravelFinds. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Exclusive Ceylon. All rights reserved.</p>
         </div>
       </div>
     </footer>

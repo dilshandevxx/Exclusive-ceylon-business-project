@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
+// Using the same images for now, but in reality these should be wide banners
 const heroImages = [
   '/images/hero-1.jpg',
   '/images/hero-2.jpg',
   '/images/hero-3.jpg',
-  '/images/hero-4.jpg',
-  '/images/hero-5.jpg',
 ];
 
 export default function Hero() {
@@ -15,44 +15,42 @@ export default function Hero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <section 
-      className="hero" 
+      className="hero-kapruka" 
       style={{ 
         backgroundImage: `url('${heroImages[currentImageIndex]}')`
       }}
     >
-      <div className="hero-overlay"></div>
-      <div className="container hero-content">
-        <span className="hero-badge fadeInUp" style={{ animationDelay: '0.1s' }}>Est. 2023</span>
-        <h1 className="hero-title fadeInUp" style={{ animationDelay: '0.3s' }}>
-          Travel smart. <br />
-          Carry tradition. <br />
-          <span className="text-accent">Live prepared.</span>
-        </h1>
-        <p className="hero-subtitle fadeInUp" style={{ animationDelay: '0.5s' }}>
-          Premium travel essentials, traditional items, wallets & belts — made for everyday journeys.
-        </p>
-        <div className="hero-buttons fadeInUp" style={{ animationDelay: '0.7s' }}>
-          <a href="#items" className="btn btn-primary btn-lg">Shop Now</a>
+      <div className="hero-overlay-gradient"></div>
+      <div className="container hero-content-kapruka">
+        <div className="hero-text-block">
+          <h1 className="hero-title-kapruka fadeInUp">
+            Everything on your list <br />
+            <span className="serif-font">Delivered like magic.</span>
+          </h1>
+          <p className="hero-subtitle-kapruka fadeInUp" style={{ animationDelay: '0.2s' }}>
+            From gifts to essentials, we bring the season to your doorstep.
+          </p>
+          <Link href="/items" className="btn-kapruka fadeInUp" style={{ animationDelay: '0.4s' }}>
+            Shop Now
+          </Link>
         </div>
-        
-        {/* Slider Indicators */}
-        <div className="slider-indicators fadeInUp" style={{ animationDelay: '0.9s' }}>
-          {heroImages.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`slider-indicator ${index === currentImageIndex ? 'active' : ''}`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+      </div>
+      
+      <div className="hero-indicators">
+        {heroImages.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentImageIndex(index)}
+            className={`indicator-dot ${index === currentImageIndex ? 'active' : ''}`}
+          />
+        ))}
       </div>
     </section>
   );

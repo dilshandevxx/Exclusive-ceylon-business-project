@@ -2,36 +2,33 @@
 import Link from 'next/link';
 
 export default function ItemCard({ item }) {
-  // Mock discount for visual similarity to the user's request
-  const originalPrice = item.price.replace('$', '') * 1.2; 
+  // Mock visually interesting flags
+  const isBestSeller = Math.random() > 0.8; 
+  const hasFreeGift = Math.random() > 0.9;
   
+  // Price formatting
+  const priceVal = parseFloat(item.price.replace(/[^0-9.]/g, '')) || 0;
+  const usPrice = (priceVal).toFixed(2);
+  const sgPrice = (priceVal * 1.3).toFixed(2); 
+
   return (
     <div className="item-card">
+      {isBestSeller && <div className="badge-bestseller">Best Seller</div>}
+      {hasFreeGift && <div className="badge-free">Free Gift</div>}
+      
       <div className="item-image-container">
-        <img src={item.image} alt={item.name} className="item-image" />
-        <a 
-          href={item.marketplaceLink} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="cart-icon-btn"
-          aria-label="Buy on Facebook"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-        </a>
+        <Link href={`/items/${item.id}`} style={{display: 'block', height: '100%'}}>
+             <img src={item.image} alt={item.name} className="item-image" />
+        </Link>
       </div>
+      
       <div className="item-details">
-        <h3 className="item-name">{item.name}</h3>
+        <Link href={`/items/${item.id}`} style={{textDecoration:'none'}}>
+          <h3 className="item-name">{item.name}</h3>
+        </Link>
         <div className="item-price-row">
-            <span className="item-price">{item.price}</span>
-            <span className="item-original-price">${originalPrice.toFixed(0)}</span>
-            <span className="item-discount">-20%</span>
-        </div>
-        <div className="item-meta">
-            <span className="item-sold">150+ sold</span>
+            <span className="item-price">US${usPrice}</span>
+            <span className="price-secondary">(SG${sgPrice})</span>
         </div>
       </div>
     </div>
