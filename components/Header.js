@@ -1,6 +1,9 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 
 // Categories list for the dropdown
 const allCategories = [
@@ -12,6 +15,9 @@ const allCategories = [
 
 export default function Header() {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
+  const { cartCount } = useCart();
 
   return (
     <div className="header-wrapper">
@@ -37,11 +43,37 @@ export default function Header() {
               <span>En</span>
            </div>
             
-            <Link href="/cart" className="top-action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </Link>
+            <div className="top-action-btn" onClick={() => {
+              if (session) {
+                router.push('/cart');
+              } else {
+                router.push('/auth/signin');
+              }
+            }} style={{cursor: 'pointer'}}>
+              <div style={{position: 'relative'}}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {cartCount > 0 && (
+                  <span style={{
+                    position: 'absolute', 
+                    top: '-8px', 
+                    right: '-8px', 
+                    backgroundColor: '#D32F2F', 
+                    color: 'white', 
+                    fontSize: '0.7rem', 
+                    borderRadius: '50%', 
+                    width: '16px', 
+                    height: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center'
+                  }}>
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+            </div>
             
             <Link href="/auth/signin" className="top-action-btn">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,8 +113,9 @@ export default function Header() {
 
            <div className="nav-links-scroll">
              <Link href="/" className="sec-nav-link">🏠 Home</Link>
-             <Link href="/sale" className="sec-nav-link">🏷️ On Sale</Link>
-             <Link href="/for-you" className="sec-nav-link">👤 For You</Link>
+             <Link href="/travelers-choice" className="sec-nav-link">🏆 Travelers' Choice</Link>
+             <Link href="/special-offers" className="sec-nav-link">🎁 Special Offers</Link>
+             <Link href="/latest-arrivals" className="sec-nav-link">🕒 Latest Arrivals</Link>
            </div>
         </div>
       </nav>

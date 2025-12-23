@@ -12,9 +12,16 @@ export default function AddProductPage() {
     stock: '',
     isNewArrival: false,
     isPopular: false,
+    isHot: false,
     isGift: false,
-    showInAll: true
+    featured: true,
+    showInAll: true,
+    // Labels
+    isBestSeller: false,
+    isTrending: false,
+    isGiftLabel: false
   });
+  const [status, setStatus] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,11 +31,49 @@ export default function AddProductPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here we would typically send data to an API
-    console.log("Submitting Product:", formData);
-    alert("Product Created! (Mock)");
+    setStatus('loading');
+    
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setStatus('success');
+        // Reset form or redirect
+        alert("Product Created Successfully!");
+        setFormData({
+            name: '',
+            price: '',
+            category: 'Grocery',
+            description: '',
+            image: '',
+            stock: '',
+            isNewArrival: false,
+            isPopular: false,
+            isHot: false,
+            isGift: false,
+            featured: true,
+            showInAll: true,
+            isBestSeller: false,
+            isTrending: false,
+            isGiftLabel: false
+        });
+      } else {
+        setStatus('error');
+        alert("Failed to create product.");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus('error');
+      alert("An error occurred.");
+    }
   };
 
   return (
@@ -124,34 +169,25 @@ export default function AddProductPage() {
               ></textarea>
           </div>
 
-          {/* Visibility Sections form user request */}
+          {/* Page Visibility Section */}
           <div style={{background: '#f9f9f9', padding:'20px', borderRadius: '8px', border:'1px solid #eee'}}>
-            <h3 style={{fontSize:'1.1rem', marginBottom:'15px', color:'var(--primary)'}}>Visibility Settings</h3>
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'15px'}}>
+            <h3 style={{fontSize:'1.1rem', marginBottom:'15px', color:'var(--primary)'}}>Page Visibility</h3>
+            <p style={{fontSize:'0.9rem', color:'#666', marginBottom:'15px'}}>Select which pages this product should appear on:</p>
+            
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))', gap:'15px'}}>
               
-              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer'}}>
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
                 <input 
                   type="checkbox" 
-                  name="showInAll" 
-                  checked={formData.showInAll} 
+                  name="featured" 
+                  checked={formData.featured} 
                   onChange={handleChange}
                   style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
                 />
-                <span>Show in "All Items"</span>
+                <span style={{fontWeight:'500'}}>Show in Home Page</span>
               </label>
 
-              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer'}}>
-                <input 
-                  type="checkbox" 
-                  name="isNewArrival" 
-                  checked={formData.isNewArrival} 
-                  onChange={handleChange}
-                  style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
-                />
-                <span>New Arrival</span>
-              </label>
-
-              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer'}}>
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
                 <input 
                   type="checkbox" 
                   name="isPopular" 
@@ -159,10 +195,10 @@ export default function AddProductPage() {
                   onChange={handleChange}
                   style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
                 />
-                <span>Popular</span>
+                <span style={{fontWeight:'500'}}>Show in Travelers' Choice Page</span>
               </label>
 
-              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer'}}>
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
                 <input 
                   type="checkbox" 
                   name="isGift" 
@@ -170,7 +206,71 @@ export default function AddProductPage() {
                   onChange={handleChange}
                   style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
                 />
-                <span>Gifts & Offers</span>
+                <span style={{fontWeight:'500'}}>Show in Special Offers Page</span>
+              </label>
+
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
+                <input 
+                  type="checkbox" 
+                  name="isNewArrival" 
+                  checked={formData.isNewArrival} 
+                  onChange={handleChange}
+                  style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
+                />
+                <span style={{fontWeight:'500'}}>Show in Latest Arrivals Page</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Label As Section */}
+          <div style={{background: '#f9f9f9', padding:'20px', borderRadius: '8px', border:'1px solid #eee'}}>
+            <h3 style={{fontSize:'1.1rem', marginBottom:'15px', color:'var(--primary)'}}>Label As</h3>
+            <p style={{fontSize:'0.9rem', color:'#666', marginBottom:'15px'}}>Add badges to highlight this product:</p>
+            
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'15px'}}>
+
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
+                <input 
+                  type="checkbox" 
+                  name="isHot" 
+                  checked={formData.isHot} 
+                  onChange={handleChange}
+                  style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
+                />
+                <span style={{fontWeight:'500'}}>HOT</span>
+              </label>
+
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
+                <input 
+                  type="checkbox" 
+                  name="isBestSeller" 
+                  checked={formData.isBestSeller} 
+                  onChange={handleChange}
+                  style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
+                />
+                <span style={{fontWeight:'500'}}>BEST SELLER</span>
+              </label>
+
+              <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
+                <input 
+                  type="checkbox" 
+                  name="isTrending" 
+                  checked={formData.isTrending} 
+                  onChange={handleChange}
+                  style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
+                />
+                <span style={{fontWeight:'500'}}>TRENDING</span>
+              </label>
+
+               <label style={{display:'flex', alignItems:'center', gap:'10px', cursor:'pointer', padding:'10px', background:'white', borderRadius:'6px', border:'1px solid #eee'}}>
+                <input 
+                  type="checkbox" 
+                  name="isGiftLabel" 
+                  checked={formData.isGiftLabel} 
+                  onChange={handleChange}
+                  style={{width:'18px', height:'18px', accentColor:'var(--primary)'}}
+                />
+                <span style={{fontWeight:'500'}}>GIFT IDEA</span>
               </label>
 
             </div>
@@ -179,9 +279,10 @@ export default function AddProductPage() {
           <button 
             type="submit" 
             className="btn" 
-            style={{backgroundColor: 'var(--primary)', color: 'white', alignSelf:'flex-start', padding:'12px 30px'}}
+            disabled={status === 'loading'}
+            style={{backgroundColor: 'var(--primary)', color: 'white', alignSelf:'flex-start', padding:'12px 30px', opacity: status === 'loading' ? 0.7 : 1}}
           >
-            Create Product
+            {status === 'loading' ? 'Creating...' : 'Create Product'}
           </button>
 
         </form>

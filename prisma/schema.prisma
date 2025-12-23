@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -71,6 +70,7 @@ model Product {
   featured    Boolean     @default(false)
   isNewArrival Boolean    @default(false)
   isPopular    Boolean    @default(false)
+  isHot        Boolean    @default(false)
   isGift       Boolean    @default(false)
   showInAll    Boolean    @default(true)
   orderItems  OrderItem[]

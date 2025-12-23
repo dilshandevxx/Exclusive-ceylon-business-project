@@ -1,25 +1,30 @@
-import Hero from '@/components/Hero';
 import ItemGrid from '@/components/ItemGrid';
-import FeaturesSection from '@/components/FeaturesSection';
+import prisma from '@/lib/prisma'; // Keep for now if needed, or better remove.
+// Replacing with mock data
+import { products } from '@/data/mockData';
+import Hero from '@/components/Hero';
 import CategoryGrid from '@/components/CategoryGrid';
-import { items } from '@/data/items';
+import FeaturesSection from '@/components/FeaturesSection';
 
-export default function Home() {
-  const newArrivals = items.filter(item => item.category === 'new');
-  const offers = items.filter(item => item.category === 'offer' || item.category === 'gift');
-  const popular = items.filter(item => item.category === 'popular');
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  // Mock data query
+  const featuredItems = products
+    .filter(item => item.featured)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 8);
 
   return (
     <div>
       <Hero />
       <CategoryGrid />
       
-      {/* Keeping Item Grids but with new CSS they match generally */}
-      <div id="items" style={{backgroundColor: '#f8f9fa'}}>
-        {newArrivals.length > 0 && <ItemGrid title="Latest Arrivals" items={newArrivals} />}
-        {offers.length > 0 && <ItemGrid title="Special Offers & Gifts" items={offers} />}
-        {popular.length > 0 && <ItemGrid title="Travelers' Choice" items={popular} />}
-      </div>
+      {featuredItems.length > 0 && (
+        <div style={{backgroundColor: '#fff', padding: '20px 0'}}>
+           <ItemGrid title="Featured Products" items={featuredItems} />
+        </div>
+      )}
       
       <FeaturesSection />
     </div>

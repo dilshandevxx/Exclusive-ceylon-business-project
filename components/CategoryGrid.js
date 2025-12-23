@@ -16,10 +16,6 @@ const categories = [
   { name: 'Home Appliances', image: '/images/hero-3.jpg', slug: 'home' },
   { name: 'Handicrafts', image: '/images/hero-1.jpg', slug: 'handicrafts' },
   { name: 'Wellness', image: '/images/hero-2.jpg', slug: 'wellness' },
-  { name: 'Stationery', image: '/images/hero-3.jpg', slug: 'stationery' },
-  { name: 'Personalized', image: '/images/hero-1.jpg', slug: 'personalized' },
-  { name: 'Kids World', image: '/images/hero-2.jpg', slug: 'kids' },
-  { name: 'Jewellery', image: '/images/hero-3.jpg', slug: 'jewellery' },
 ];
 
 export default function CategoryGrid() {

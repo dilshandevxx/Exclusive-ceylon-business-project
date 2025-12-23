@@ -18,99 +18,97 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="stats-grid">
+        <div style={{color: '#6b7280'}}>Welcome back, Admin</div>
+
+
+      <div className="admin-dashboard-grid">
         <div className="stat-card">
-          <div className="stat-icon">💰</div>
-          <div className="stat-info">
-            <h3>Total Sales</h3>
-            <div className="value">LKR 45,250</div>
+          <div className="stat-icon primary">💰</div>
+          <div>
+            <div className="stat-label">Total Sales</div>
+            <div className="stat-value">LKR 1.2M</div>
           </div>
         </div>
-        
         <div className="stat-card">
-          <div className="stat-icon">📦</div>
-          <div className="stat-info">
-            <h3>Total Orders</h3>
-            <div className="value">124</div>
+          <div className="stat-icon warning">📦</div>
+          <div>
+            <div className="stat-label">Total Orders</div>
+            <div className="stat-value">1,245</div>
           </div>
         </div>
-        
         <div className="stat-card">
-          <div className="stat-icon">👥</div>
-          <div className="stat-info">
-            <h3>Customers</h3>
-            <div className="value">89</div>
+          <div className="stat-icon success">🛍️</div>
+          <div>
+            <div className="stat-label">Products</div>
+            <div className="stat-value">85</div>
           </div>
         </div>
-        
         <div className="stat-card">
-          <div className="stat-icon">⚠️</div>
-          <div className="stat-info">
-            <h3>Pending</h3>
-            <div className="value">12</div>
+          <div className="stat-icon info">👥</div>
+          <div>
+            <div className="stat-label">Customers</div>
+            <div className="stat-value">3.5k</div>
           </div>
         </div>
       </div>
 
-      <div style={{display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px'}}>
-        {/* Sales Chart */}
-        <div className="admin-chart-container">
-          <h3 style={{marginBottom: '1rem', color: 'var(--text-primary)'}}>Weekly Revenue</h3>
-          <div className="chart-bars">
-            {chartData.map((data, index) => (
-              <div 
-                key={index} 
-                className="chart-bar" 
-                style={{height: `${data.value}%`}}
-              >
-                <span className="chart-tooltip">LKR {data.label}</span>
-                <span className="chart-label">{data.day}</span>
-              </div>
-            ))}
-          </div>
+      <div className="admin-chart-container">
+         <h3 style={{fontSize:'1.1rem', marginBottom:'20px', color: '#1f2937'}}>Sales & Revenue Overview</h3>
+         <div style={{width:'100%', height:'300px', backgroundColor:'#f9fafb', borderRadius:'8px', display:'flex', alignItems:'center', justifyContent:'center', color:'#9ca3af'}}>
+            [Sales Chart Placeholder]
+         </div>
+      </div>
+
+      <div className="admin-table-container">
+        <div style={{padding:'20px', borderBottom:'1px solid #e5e7eb'}}>
+            <h3 style={{fontSize:'1.1rem', color: '#1f2937'}}>Recent Orders</h3>
         </div>
-
-        {/* Activity Feed */}
-        <div className="activity-feed">
-          <h3 style={{marginBottom: '1rem', color: 'var(--text-primary)'}}>Recent Activity</h3>
-          
-          <div className="activity-item">
-            <div className="activity-icon">🛒</div>
-            <div className="activity-details">
-              <h4>New Order #7746</h4>
-              <p>Sandun placed an order.</p>
-            </div>
-            <div className="activity-time">5m</div>
-          </div>
-
-          <div className="activity-item">
-            <div className="activity-icon">👤</div>
-            <div className="activity-details">
-              <h4>New Customer</h4>
-              <p>John Doe registered.</p>
-            </div>
-            <div className="activity-time">2h</div>
-          </div>
-
-          <div className="activity-item">
-            <div className="activity-icon">📦</div>
-            <div className="activity-details">
-              <h4>Stock Alert</h4>
-              <p>Handwoven Basket low stock.</p>
-            </div>
-            <div className="activity-time">4h</div>
-          </div>
-
-           <div className="activity-item">
-            <div className="activity-icon">⭐</div>
-            <div className="activity-details">
-              <h4>New Review</h4>
-              <p>Sarah reviewed Ceylon Tea.</p>
-            </div>
-            <div className="activity-time">1d</div>
-          </div>
-        </div>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#ORD-7741</td>
+              <td>Sarah Perera</td>
+              <td>Oct 24, 2023</td>
+              <td>LKR 12,500</td>
+              <td><span className="status-badge status-completed">Completed</span></td>
+              <td>View</td>
+            </tr>
+            <tr>
+              <td>#ORD-7742</td>
+              <td>Kasun Jayasuriya</td>
+              <td>Oct 24, 2023</td>
+              <td>LKR 8,250</td>
+              <td><span className="status-badge status-pending">Pending</span></td>
+              <td>View</td>
+            </tr>
+            <tr>
+              <td>#ORD-7743</td>
+              <td>Amara Silva</td>
+              <td>Oct 23, 2023</td>
+              <td>LKR 25,000</td>
+              <td><span className="status-badge status-cancelled">Cancelled</span></td>
+              <td>View</td>
+            </tr>
+            <tr>
+              <td>#ORD-7744</td>
+              <td>Nimali Fernando</td>
+              <td>Oct 23, 2023</td>
+              <td>LKR 4,500</td>
+              <td><span className="status-badge status-completed">Completed</span></td>
+              <td>View</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
