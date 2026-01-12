@@ -16,16 +16,23 @@ export const authOptions = {
       async authorize(credentials, req) {
         // Simple mock check for demo purposes
         if (credentials?.email === "sandun@example.com" && credentials?.password === "123") {
-            // Check if user exists in DB, if not create to ensure relationships work
+            // Check if user exists in DB
             let user = await prisma.user.findUnique({ where: { email: credentials.email } });
+            
             if (!user) {
                 user = await prisma.user.create({
                     data: {
                         email: credentials.email,
                         name: "Sandun Traveler",
-                        role: "USER",
-                        password: "hashed_password_placeholder" // in real app use bcrypt
+                        role: "ADMIN", // Force Admin for this test user
+                        password: "hashed_password_placeholder" 
                     }
+                });
+            } else if (user.role !== 'ADMIN') {
+                // Auto-upgrade to ADMIN for testing if they already exist
+                user = await prisma.user.update({
+                    where: { email: credentials.email },
+                    data: { role: 'ADMIN' }
                 });
             }
             return user;
