@@ -1,7 +1,7 @@
 import ItemGrid from '@/components/ItemGrid';
 import prisma from '@/lib/prisma'; // Keep for now if needed, or better remove.
 // Replacing with mock data
-import { products } from '@/data/mockData';
+// import { products } from '@/data/mockData';
 import Hero from '@/components/Hero';
 import CategoryGrid from '@/components/CategoryGrid';
 import FeaturesSection from '@/components/FeaturesSection';
@@ -9,11 +9,15 @@ import FeaturesSection from '@/components/FeaturesSection';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  // Mock data query
-  const featuredItems = products
-    .filter(item => item.featured)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 8);
+  // Fetch real data from DB
+  const featuredItems = await prisma.product.findMany({
+    where: { 
+      featured: true,
+      // optional: add showInAll: true if needed
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 8
+  });
 
   return (
     <div>
