@@ -1,7 +1,7 @@
 export const items = [
   // New Arrived
   {
-    id: 1
+    id: 1,
     name: "Vintage Leather Travel Bag",
     description: "Handcrafted genuine leather bag, perfect for weekend getaways.",
     price: "$120",
