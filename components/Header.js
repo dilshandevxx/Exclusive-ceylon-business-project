@@ -116,6 +116,7 @@ export default function Header() {
              <Link href="/travelers-choice" className="sec-nav-link">🏆 Travelers' Choice</Link>
              <Link href="/special-offers" className="sec-nav-link">🎁 Special Offers</Link>
              <Link href="/latest-arrivals" className="sec-nav-link">🕒 Latest Arrivals</Link>
+              <Link href="/contact" className="sec-nav-link">📞 Contact Us</Link>
            </div>
         </div>
       </nav>
