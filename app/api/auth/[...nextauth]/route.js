@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
+import bcrypt from 'bcryptjs'
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -14,22 +15,23 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        // Simple mock check for demo purposes
+        // 1. Special Admin Backdoor (Keep existing logic or ensure it works)
         if (credentials?.email === "sandun@example.com" && credentials?.password === "123") {
-            // Check if user exists in DB
             let user = await prisma.user.findUnique({ where: { email: credentials.email } });
             
             if (!user) {
+                // If admin test user doesn't exist, create it
+                const hashedPassword = await bcrypt.hash("123", 10);
                 user = await prisma.user.create({
                     data: {
                         email: credentials.email,
                         name: "Sandun Traveler",
-                        role: "ADMIN", // Force Admin for this test user
-                        password: "hashed_password_placeholder" 
+                        role: "ADMIN",
+                        password: hashedPassword 
                     }
                 });
             } else if (user.role !== 'ADMIN') {
-                // Auto-upgrade to ADMIN for testing if they already exist
+                // Auto-upgrade to ADMIN
                 user = await prisma.user.update({
                     where: { email: credentials.email },
                     data: { role: 'ADMIN' }
@@ -37,6 +39,20 @@ export const authOptions = {
             }
             return user;
         }
+
+        // 2. Standard User Login (Real DB Check)
+        const user = await prisma.user.findUnique({ 
+            where: { email: credentials.email } 
+        });
+
+        if (user && user.password) {
+            // Verify password
+            const isValid = await bcrypt.compare(credentials.password, user.password);
+            if (isValid) {
+                return user;
+            }
+        }
+        
         return null
       }
     })
