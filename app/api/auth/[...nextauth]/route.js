@@ -15,45 +15,61 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        // 1. Special Admin Backdoor (Keep existing logic or ensure it works)
+        console.log("Authorize called with:", credentials?.email);
+
+        // 1. Special Admin Backdoor (Keep existing logic)
         if (credentials?.email === "sandun@example.com" && credentials?.password === "123") {
-            let user = await prisma.user.findUnique({ where: { email: credentials.email } });
-            
-            if (!user) {
-                // If admin test user doesn't exist, create it
-                const hashedPassword = await bcrypt.hash("123", 10);
-                user = await prisma.user.create({
-                    data: {
-                        email: credentials.email,
-                        name: "Sandun Traveler",
-                        role: "ADMIN",
-                        password: hashedPassword 
-                    }
-                });
-            } else if (user.role !== 'ADMIN') {
-                // Auto-upgrade to ADMIN
-                user = await prisma.user.update({
-                    where: { email: credentials.email },
-                    data: { role: 'ADMIN' }
-                });
+            try {
+                let user = await prisma.user.findUnique({ where: { email: credentials.email } });
+                
+                if (!user) {
+                    const hashedPassword = await bcrypt.hash("123", 10);
+                    user = await prisma.user.create({
+                        data: {
+                            email: credentials.email,
+                            name: "Sandun Traveler",
+                            role: "ADMIN",
+                            password: hashedPassword 
+                        }
+                    });
+                } else if (user.role !== 'ADMIN') {
+                    user = await prisma.user.update({
+                        where: { email: credentials.email },
+                        data: { role: 'ADMIN' }
+                    });
+                }
+                return user;
+            } catch (e) {
+                console.error("Admin backdoor error:", e);
+                return null;
             }
-            return user;
         }
 
         // 2. Standard User Login (Real DB Check)
-        const user = await prisma.user.findUnique({ 
-            where: { email: credentials.email } 
-        });
+        try {
+            const user = await prisma.user.findUnique({ 
+                where: { email: credentials.email } 
+            });
 
-        if (user && user.password) {
-            // Verify password
-            const isValid = await bcrypt.compare(credentials.password, user.password);
-            if (isValid) {
-                return user;
+            console.log("User found:", user ? "YES" : "NO");
+
+            if (user && user.password) {
+                // Verify password
+                const isValid = await bcrypt.compare(credentials.password, user.password);
+                console.log("Password valid:", isValid);
+                
+                if (isValid) {
+                    return user;
+                }
+            } else {
+                console.log("User missing or no password set");
             }
+        } catch (error) {
+            console.error("Login Error:", error);
+            throw new Error(`Login failed: ${error.message}`);
         }
         
-        return null
+        return null; // Return null if login fails
       }
     })
   ],
