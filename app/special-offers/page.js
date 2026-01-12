@@ -1,12 +1,15 @@
 import ItemGrid from '@/components/ItemGrid';
-// import prisma from '@/lib/prisma';
-import { products } from '@/data/mockData';
+import prisma from '@/lib/prisma';
+// import { products } from '@/data/mockData';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SpecialOffersPage() {
-  // Mock data query
-  const items = products.filter(item => item.isGift).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  // Fetch from DB
+  const items = await prisma.product.findMany({
+    where: { isGift: true },
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <main>

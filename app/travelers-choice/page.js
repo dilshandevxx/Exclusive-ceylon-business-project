@@ -1,11 +1,14 @@
-import ItemGrid from '@/components/ItemGrid';
-import { products } from '@/data/mockData';
+import prisma from '@/lib/prisma';
+// import { products } from '@/data/mockData';
 
 export const dynamic = 'force-dynamic';
 
-export default function TravelersChoicePage() {
-  // Filter for popular items
-  const popularItems = products.filter(item => item.isPopular);
+export default async function TravelersChoicePage() {
+  // Fetch from DB
+  const popularItems = await prisma.product.findMany({
+    where: { isPopular: true },
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <main>

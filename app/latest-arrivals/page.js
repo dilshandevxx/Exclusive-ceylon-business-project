@@ -1,13 +1,14 @@
-import ItemGrid from '@/components/ItemGrid';
-import { products } from '@/data/mockData';
+import prisma from '@/lib/prisma';
+// import { products } from '@/data/mockData';
 
 export const dynamic = 'force-dynamic';
 
-export default function LatestArrivalsPage() {
-  // Filter for new arrival items and sort by newest first
-  const newArrivals = products
-    .filter(item => item.isNewArrival)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+export default async function LatestArrivalsPage() {
+  // Fetch from DB
+  const newArrivals = await prisma.product.findMany({
+    where: { isNewArrival: true },
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <main>
