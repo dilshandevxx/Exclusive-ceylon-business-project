@@ -1,11 +1,10 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-// import { PrismaAdapter } from "@next-auth/prisma-adapter"
-// import prisma from "@/lib/prisma"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import prisma from "@/lib/prisma"
 
 export const authOptions = {
-  // Uncomment the adapter when you have a valid DATABASE_URL in .env
-  // adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
   
   providers: [
     CredentialsProvider({
@@ -15,13 +14,22 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, req) {
-        // Mock authentication for demonstration
-        // Replace this with real password verification against the database
+        // Simple mock check for demo purposes
         if (credentials?.email === "sandun@example.com" && credentials?.password === "123") {
-            return { id: "1", name: "Sandun Traveler", email: "sandun@example.com", role: "USER" }
+            // Check if user exists in DB, if not create to ensure relationships work
+            let user = await prisma.user.findUnique({ where: { email: credentials.email } });
+            if (!user) {
+                user = await prisma.user.create({
+                    data: {
+                        email: credentials.email,
+                        name: "Sandun Traveler",
+                        role: "USER",
+                        password: "hashed_password_placeholder" // in real app use bcrypt
+                    }
+                });
+            }
+            return user;
         }
-        
-        // Return null if user data could not be retrieved
         return null
       }
     })
