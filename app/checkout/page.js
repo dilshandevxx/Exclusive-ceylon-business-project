@@ -1,48 +1,97 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: 'Travel Backpack', price: 85.00, qty: 1, image: '/images/hero-3.jpg' },
-    { id: 2, name: 'Noise Cancelling Headphones', price: 250.00, qty: 1, image: '/images/hero-5.jpg' }
-  ]);
+  const { cartItems, cartTotal, clearCart, updateQuantity, removeFromCart } = useCart();
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstName: 'Sandun',
-    lastName: 'Traveler',
-    email: 'sandun@example.com',
-    phone: '+94 77 123 4567',
-    address: '123 Galle Road',
-    city: 'Colombo',
-    zip: '00300',
+    firstName: session?.user?.name?.split(' ')[0] || '',
+    lastName: session?.user?.name?.split(' ')[1] || '',
+    email: session?.user?.email || '',
+    phone: '',
+    address: '',
+    city: '',
+    zip: '',
   });
+
+  // Update form if session loads later
+  useEffect(() => {
+    if (session?.user) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: prev.firstName || session.user.name?.split(' ')[0] || '',
+        lastName: prev.lastName || session.user.name?.split(' ')[1] || '',
+        email: prev.email || session.user.email || ''
+      }));
+    }
+  }, [session]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Order placed successfully! (Mock Action)');
-  };
+    
+    if (!session) {
+      alert("Please sign in to place an order.");
+      router.push('/auth/signin?callbackUrl=/checkout');
+      return;
+    }
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  const total = subtotal; // Free shipping
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
 
-  const updateQty = (id, change) => {
-    setCartItems(cartItems.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(1, item.qty + change);
-        return { ...item, qty: newQty };
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: cartItems,
+          total: cartTotal,
+          shippingAddress: `${formData.address}, ${formData.city}, ${formData.zip}`,
+          paymentMethod: 'Cash on Delivery' // Hardcoded for now as per UI
+        }),
+      });
+
+      if (res.ok) {
+        clearCart();
+        alert('Order placed successfully! Redirecting to profile...');
+        router.push('/profile'); // Assuming a profile page exists or will exist
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to place order: ${errorData.error}`);
       }
-      return item;
-    }));
+    } catch (error) {
+      console.error("Checkout validation failed", error);
+      alert("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
+  if (cartItems.length === 0) {
+    return (
+      <div className="container" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
+        <h1 className="section-title">Your Cart is Empty</h1>
+        <p style={{ marginBottom: '2rem' }}>Looks like you haven't added anything yet.</p>
+        <Link href="/" className="btn btn-primary">Start Shopping</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="container" style={{ padding: '6rem 2rem' }}>
@@ -53,15 +102,48 @@ export default function CheckoutPage() {
         {/* Checkout Form */}
         <div className="checkout-form-section">
           <h2 style={{ marginBottom: '1.5rem', fontSize: '1.3rem', color: 'var(--text-primary)' }}>Shipping Details</h2>
-          <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-             <p style={{ fontWeight: '700', fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{formData.firstName} {formData.lastName}</p>
-             <p style={{ color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>{formData.email}</p>
-             <p style={{ color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>{formData.phone}</p>
-             <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed #cbd5e1' }}>
-               <p style={{ color: 'var(--text-primary)' }}>{formData.address}</p>
-               <p style={{ color: 'var(--text-primary)' }}>{formData.city}, {formData.zip}</p>
+          
+          <form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <input 
+                  type="text" name="firstName" placeholder="First Name" 
+                  value={formData.firstName} onChange={handleChange} required 
+                  className="form-input"
+                />
+                <input 
+                  type="text" name="lastName" placeholder="Last Name" 
+                  value={formData.lastName} onChange={handleChange} required 
+                  className="form-input"
+                />
              </div>
-          </div>
+             <input 
+                type="email" name="email" placeholder="Email Address" 
+                value={formData.email} onChange={handleChange} required disabled 
+                className="form-input" style={{ opacity: 0.7 }}
+             />
+             <input 
+                type="tel" name="phone" placeholder="Phone Number" 
+                value={formData.phone} onChange={handleChange} required 
+                className="form-input"
+             />
+             <input 
+                type="text" name="address" placeholder="Address" 
+                value={formData.address} onChange={handleChange} required 
+                className="form-input"
+             />
+             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <input 
+                  type="text" name="city" placeholder="City" 
+                  value={formData.city} onChange={handleChange} required 
+                  className="form-input"
+                />
+                <input 
+                  type="text" name="zip" placeholder="Zip Code" 
+                  value={formData.zip} onChange={handleChange} required 
+                  className="form-input"
+                />
+             </div>
+          </form>
 
           <div style={{ marginTop: '2rem' }}>
              <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Payment Method</h3>
@@ -78,8 +160,13 @@ export default function CheckoutPage() {
              </div>
           </div>
 
-          <button onClick={handleSubmit} className="btn btn-primary" style={{ marginTop: '2rem', width: '100%' }}>
-            Confirm Order
+          <button 
+            onClick={handleSubmit} 
+            disabled={loading}
+            className="btn btn-primary" 
+            style={{ marginTop: '2rem', width: '100%' }}
+          >
+            {loading ? 'Processing...' : 'Confirm Order'}
           </button>
         </div>
 
@@ -98,15 +185,15 @@ export default function CheckoutPage() {
                     <p style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '0.2rem' }}>{item.name}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid #e2e8f0', borderRadius: '4px', padding: '2px 5px' }}>
-                        <button onClick={() => updateQty(item.id, -1)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0 5px' }}>-</button>
-                        <span style={{ fontSize: '0.8rem' }}>{item.qty}</span>
-                        <button onClick={() => updateQty(item.id, 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0 5px' }}>+</button>
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0 5px' }}>-</button>
+                        <span style={{ fontSize: '0.8rem' }}>{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0 5px' }}>+</button>
                       </div>
-                      <button onClick={() => removeItem(item.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#e74c3c', fontSize: '0.8rem' }}>Remove</button>
+                      <button onClick={() => removeFromCart(item.id)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#e74c3c', fontSize: '0.8rem' }}>Remove</button>
                     </div>
                   </div>
                 </div>
-                <span style={{ fontWeight: '600' }}>${(item.price * item.qty).toFixed(2)}</span>
+                <span style={{ fontWeight: '600' }}>LKR {(item.price * item.quantity).toFixed(2)}</span>
               </div>
             ))}
           </div>
@@ -114,7 +201,7 @@ export default function CheckoutPage() {
           <div style={{ borderTop: '2px solid #f1f5f9', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>LKR {cartTotal.toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
               <span>Shipping</span>
@@ -122,7 +209,7 @@ export default function CheckoutPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '800', fontSize: '1.2rem', marginTop: '0.5rem', color: 'var(--text-primary)' }}>
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>LKR {cartTotal.toFixed(2)}</span>
             </div>
           </div>
         </div>
