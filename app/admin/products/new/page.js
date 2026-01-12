@@ -46,25 +46,13 @@ export default function AddProductPage() {
 
       if (res.ok) {
         setStatus('success');
-        // Reset form or redirect
-        alert("Product Created Successfully!");
+        // Do not reset form immediately so we can show the details
+        // alert("Product Created Successfully!"); 
+        /* 
         setFormData({
-            name: '',
-            price: '',
-            category: 'Grocery',
-            description: '',
-            image: '',
-            stock: '',
-            isNewArrival: false,
-            isPopular: false,
-            isHot: false,
-            isGift: false,
-            featured: true,
-            showInAll: true,
-            isBestSeller: false,
-            isTrending: false,
-            isGiftLabel: false
+            ...
         });
+        */
       } else {
         setStatus('error');
         alert("Failed to create product.");
@@ -286,6 +274,22 @@ export default function AddProductPage() {
           </button>
 
         </form>
+
+        {status === 'success' && (
+          <div style={{marginTop: '30px', padding: '20px', backgroundColor: '#d1fae5', borderRadius: '8px', border: '1px solid #10b981'}}>
+             <h3 style={{color: '#065f46', marginBottom: '10px'}}>✅ Product Created Successfully!</h3>
+             <p style={{marginBottom: '5px'}}>The following product is now live on the website:</p>
+             <ul style={{listStyle: 'none', padding: 0, marginTop: '10px', color: '#047857'}}>
+                <li><strong>Name:</strong> {formData.name}</li>
+                <li><strong>Price:</strong> LKR {formData.price}</li>
+                <li><strong>Category:</strong> {formData.category}</li>
+             </ul>
+             <div style={{marginTop: '15px', display: 'flex', gap: '10px'}}>
+                 <Link href="/" target="_blank" style={{textDecoration: 'underline', color: '#059669', fontWeight: 'bold'}}>View on Client Website &rarr;</Link>
+                 <button onClick={() => setStatus('')} style={{background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', color: '#059669'}}>Add Another Product</button>
+             </div>
+          </div>
+        )}
       </div>
     </div>
   );
